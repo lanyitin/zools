@@ -1,0 +1,29 @@
+primitive Float = /\d+\.\d+/;
+primitive UUID = /[a-zA-Z0-9\-]+/;
+primitive Boolean = /(true|false|True|False)/;
+primitive DateTime = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}/;
+primitive Temperature = /\d+(\.\d+)?/;
+primitive Float = /\d+\.\d+/;
+
+struct ParkingDCU {
+	Parking_ID: UUID,
+	SEN_ID: UUID,
+	Park_Status: Boolean,
+	Record_Time: DateTime,
+	TEMP: Temperature,
+	lat: Float,
+	lng: Float
+}
+
+struct LatLng {
+	lat: Float,
+	lng: Float
+}
+
+target: ParkingDCU(Parking_ID     = id,
+                    SEN_ID         = sensor,
+                    Park_Status    = slot_status,
+                    Record_Time    = timestamp
+)
+
+location: LatLng(lat = x, lng = y)
