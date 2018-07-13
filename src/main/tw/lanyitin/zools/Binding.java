@@ -6,12 +6,10 @@ public class Binding {
 	private final String lValue;
 	private final String rValue;
 	private final MappingContext context;
-	private final boolean optional;
 
-	public Binding(String lValue, String rValue, boolean optional, MappingContext context) {
+	public Binding(String lValue, String rValue, MappingContext context) {
 		this.lValue = lValue;
 		this.rValue = rValue;
-		this.optional = optional;
 		this.context = context;
 	}
 	
@@ -22,10 +20,6 @@ public class Binding {
 	
 	public String getRValue() {
 		return rValue;
-	}
-
-	public boolean isOptional() {
-		return optional;
 	}
 
 	public MappingContext getContext() {

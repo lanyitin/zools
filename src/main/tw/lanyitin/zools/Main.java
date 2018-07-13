@@ -20,7 +20,9 @@ public class Main {
         visitor.visitFile(parser.file());
         JsonElementFactory jsonElementFactory = new JsonElementFactory();
 		String origin_str = readFromFile(args[1]);
+		System.out.println("Origin String");
 		System.out.println(origin_str);
+		System.out.println("Result");
 		System.out.println(visitor.convert(jsonElementFactory.parse(origin_str), jsonElementFactory));
 	}
 	
@@ -40,6 +42,7 @@ public class Main {
         {
             e.printStackTrace();
         }
-        return contentBuilder.toString();
+        String result = contentBuilder.toString();
+        return result.substring(0, result.length() - 1);
     }
 }

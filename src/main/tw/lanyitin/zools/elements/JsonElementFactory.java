@@ -21,8 +21,16 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 	}
 	
 	public JsonElement convert(Element elem) {
-		if (elem instanceof StringElement) {
-			return new JsonPrimitive(((StringElement)elem).getContent());
+		if (elem instanceof PrimitiveElement) {
+			Object content = ((PrimitiveElement<?>)elem).getContent();
+			if (content instanceof String) {
+				return new JsonPrimitive((String) content);
+			} else if (content instanceof Boolean) {
+				return new JsonPrimitive((Boolean) content);
+			} else {
+				return new JsonPrimitive((Number) content);
+			}
+			
 		} else if (elem instanceof StructElement) {
 			StructElement target = (StructElement) elem;
 			final JsonObject result = new JsonObject();
@@ -39,7 +47,15 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 	
 	private Element visitJsonElement(JsonElement element) {
 		if (element.isJsonPrimitive()) {
-			return new StringElement(element.getAsString());
+			JsonPrimitive primitive = element.getAsJsonPrimitive();
+			if (primitive.isBoolean()) {
+				return new PrimitiveElement<Boolean>(primitive.getAsBoolean());
+			} else if (primitive.isNumber()) {
+				return new PrimitiveElement<Number>(primitive.getAsNumber());
+			} else {
+				return new PrimitiveElement<String>(primitive.getAsString());
+			}
+			
 		} else if (element.isJsonObject()) {
 			final List<Property> properties = new ArrayList<Property>();
 			JsonObject obj = element.getAsJsonObject();

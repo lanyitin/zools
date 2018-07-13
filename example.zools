@@ -1,3 +1,7 @@
+//1. Field Format
+//    以正規表達式來描述欄位的格式
+//    語法為： primitive <Name> = /<Regular Expression>/;
+
 primitive Float = /\d+\.\d+/;
 primitive UUID = /[a-zA-Z0-9\-]+/;
 primitive Boolean = /(true|false|True|False)/;
@@ -5,25 +9,34 @@ primitive DateTime = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}/;
 primitive Temperature = /\d+(\.\d+)?/;
 primitive Float = /\d+\.\d+/;
 
+
+//2. Data Structure
+//   以類似C的struct來描述不同的資料結構
+//   語法為：
+//   struct <Name> {
+//       <Property Name> : <Property Type>,
+//       ...
+//   }
+//   目前<Property Type>只能用Field Format裡定義，日後打算支援Data Structure
 struct ParkingDCU {
 	Parking_ID: UUID,
 	SEN_ID: UUID,
 	Park_Status: Boolean,
-	Record_Time: DateTime,
-	TEMP: Temperature,
-	lat: Float,
-	lng: Float
+	Record_Time: DateTime
 }
 
-struct LatLng {
-	lat: Float,
-	lng: Float
-}
+//3. Rules
+//   以類似Makefile的寫法來描述受測資料的格式，
+//   名稱為target的goal是整個mapping rule的起始點，代表的是受測資料需符合這個target所描述的rule
+//   語法1為：    target: <Type>
+//   語法2為：    target: <Type>(<Binding Rules>)
+//   <Type>目前可支援Primitive或是Data Structure
+//   <Binding Rules>的語法為 ： <Data Structure 的 Property Name> = <受測資料的Property Name>
 
+
+//   以下的rule是針對{"id":"a-b-c", "sensor":"b-c-d", "slot_status":true, "timestamp":"2017-07-12T23:19:00.000"}所撰寫
 target: ParkingDCU(Parking_ID     = id,
-                    SEN_ID         = sensor,
-                    Park_Status    = slot_status,
-                    Record_Time    = timestamp
+                   SEN_ID         = sensor,
+                   Park_Status    = slot_status,
+                   Record_Time    = timestamp
 )
-
-location: LatLng(lat = x, lng = y)

@@ -19,8 +19,9 @@ TOKEN_RBRACKET: ']';
 TOKEN_BACK_SLASH: '/' -> more;
 TOKEN_AT: '@';
 TOKEN_DOT: '.';
-ESCAPED_BACKSLASH: '//';
+ESCAPED_BACKSLASH: '\\/';
 TOKEN_REGEX: '/' ( ESCAPED_BACKSLASH | ~('\n'|'\r') )*? '/';
+TOKEN_COMMENT: '//' (~('\n'|'\r')+) TOKEN_NEWLINE -> skip;
 
 
 file: primitive+ struct_def+ mapping_rule+ EOF;
