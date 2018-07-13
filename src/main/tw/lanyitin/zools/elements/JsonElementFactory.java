@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -40,6 +41,13 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 				}
 			});
 			return result;
+		} else if (elem instanceof ListElement) {
+			final JsonArray ary = new JsonArray();
+			ListElement target = (ListElement) elem;
+			for (Element elem2 : target.getChilds()) {
+				ary.add(convert(elem2));
+			}
+			return ary;
 		} else {
 			return null;
 		}
@@ -65,8 +73,23 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 					properties.add(new Property(t.getKey(), visitJsonElement(t.getValue())));
 				}});
 			return new StructElement(properties);
+		} else if (element.isJsonArray()) {
+			List<Element> lst = new ArrayList<Element>();
+			for (JsonElement elem : element.getAsJsonArray()) {
+				lst.add(visitJsonElement(elem));
+			}
+			return new ListElement(lst);
 		} else {
 			return null;
 		}
+	}
+
+	@Override
+	public JsonElement constructList(List<JsonElement> elements) {
+		JsonArray ary = new JsonArray();
+		for (JsonElement elem : elements) {
+			ary.add(elem);
+		}
+		return ary;
 	}
 }

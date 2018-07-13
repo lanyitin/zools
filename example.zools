@@ -35,8 +35,8 @@ struct ParkingDCU {
 
 
 //   以下的rule是針對{"id":"a-b-c", "sensor":"b-c-d", "slot_status":true, "timestamp":"2017-07-12T23:19:00.000"}所撰寫
-target: ParkingDCU(Parking_ID     = id,
+target: [ParkingDCU(Parking_ID     = id,
                    SEN_ID         = sensor,
                    Park_Status    = slot_status,
                    Record_Time    = timestamp
-)
+)]
