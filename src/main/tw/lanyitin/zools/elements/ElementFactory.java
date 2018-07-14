@@ -6,8 +6,5 @@ abstract public class ElementFactory<T> {
 
 	public abstract Element parse(String str);
 
-	public abstract T convert(Element elem);
-	
-	public abstract T constructList(List<T> elements);
-
+	public abstract T convert(Element elem, String tagName);
 }

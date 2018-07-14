@@ -11,17 +11,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
-import tw.lanyitin.zools.Property;
+import tw.lanyitin.zools.runtime.Property;
 
 public class JsonElementFactory extends ElementFactory<JsonElement> {
 	static JsonParser parser = new JsonParser();
 	
 	public Element parse(String str) {
 		JsonElement element = parser.parse(str);
-		return visitJsonElement(element);
+		return transformToElement(element);
 	}
 	
-	public JsonElement convert(Element elem) {
+	public JsonElement convert(Element elem, String tagName) {
 		if (elem instanceof PrimitiveElement) {
 			Object content = ((PrimitiveElement<?>)elem).getContent();
 			if (content instanceof String) {
@@ -37,7 +37,7 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 			final JsonObject result = new JsonObject();
 			target.getProperties().forEach(new Consumer<Property>() {
 				public void accept(Property t) {
-					result.add(t.getName(), convert(t.getValue()));
+					result.add(t.getName(), convert(t.getValue(), t.getName()));
 				}
 			});
 			return result;
@@ -45,7 +45,7 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 			final JsonArray ary = new JsonArray();
 			ListElement target = (ListElement) elem;
 			for (Element elem2 : target.getChilds()) {
-				ary.add(convert(elem2));
+				ary.add(convert(elem2, null));
 			}
 			return ary;
 		} else {
@@ -53,7 +53,7 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 		}
 	}
 	
-	private Element visitJsonElement(JsonElement element) {
+	public Element transformToElement(JsonElement element) {
 		if (element.isJsonPrimitive()) {
 			JsonPrimitive primitive = element.getAsJsonPrimitive();
 			if (primitive.isBoolean()) {
@@ -70,26 +70,17 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 			obj.entrySet().stream().forEach(new Consumer<Entry<String, JsonElement>>() {
 
 				public void accept(Entry<String, JsonElement> t) {
-					properties.add(new Property(t.getKey(), visitJsonElement(t.getValue())));
+					properties.add(new Property(t.getKey(), transformToElement(t.getValue())));
 				}});
 			return new StructElement(properties);
 		} else if (element.isJsonArray()) {
 			List<Element> lst = new ArrayList<Element>();
 			for (JsonElement elem : element.getAsJsonArray()) {
-				lst.add(visitJsonElement(elem));
+				lst.add(transformToElement(elem));
 			}
 			return new ListElement(lst);
 		} else {
 			return null;
 		}
-	}
-
-	@Override
-	public JsonElement constructList(List<JsonElement> elements) {
-		JsonArray ary = new JsonArray();
-		for (JsonElement elem : elements) {
-			ary.add(elem);
-		}
-		return ary;
 	}
 }

@@ -7,7 +7,6 @@ primitive UUID = /[a-zA-Z0-9\-]+/;
 primitive Boolean = /(true|false|True|False)/;
 primitive DateTime = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}/;
 primitive Temperature = /\d+(\.\d+)?/;
-primitive Float = /\d+\.\d+/;
 
 
 //2. Data Structure
@@ -18,11 +17,18 @@ primitive Float = /\d+\.\d+/;
 //       ...
 //   }
 //   目前<Property Type>只能用Field Format裡定義，日後打算支援Data Structure
+
+struct LatLng {
+	lat: Float,
+	lng: Float
+}
+
 struct ParkingDCU {
-	Parking_ID: UUID,
-	SEN_ID: UUID,
-	Park_Status: Boolean,
-	Record_Time: DateTime
+	ParkingID: UUID,
+	SenID: UUID, 
+	ParkStatus: Boolean,
+	RecordTime: DateTime,
+	loc: LatLng
 }
 
 //3. Rules
@@ -34,9 +40,12 @@ struct ParkingDCU {
 //   <Binding Rules>的語法為 ： <Data Structure 的 Property Name> = <受測資料的Property Name>
 
 
+location: LatLng(lat = x, lng = y)
+
 //   以下的rule是針對{"id":"a-b-c", "sensor":"b-c-d", "slot_status":true, "timestamp":"2017-07-12T23:19:00.000"}所撰寫
-target: [ParkingDCU(Parking_ID     = id,
-                   SEN_ID         = sensor,
-                   Park_Status    = slot_status,
-                   Record_Time    = timestamp
+target: [ParkingDCU(ParkingID     = id,
+                   SenID         = sensor,
+                   ParkStatus    = slot_status,
+                   RecordTime    = timestamp,
+                   loc            = pos@location
 )]
