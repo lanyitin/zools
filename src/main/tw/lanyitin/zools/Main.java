@@ -8,34 +8,48 @@ import java.util.function.Predicate;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-
-import com.google.gson.JsonElement;
-
 import tw.lanyitin.zools.ast.ASTGenerator;
 import tw.lanyitin.zools.ast.RuleStmt;
 import tw.lanyitin.zools.ast.ZoolsFile;
 import tw.lanyitin.zools.elements.Element;
+import tw.lanyitin.zools.elements.ElementFactory;
 import tw.lanyitin.zools.elements.JsonElementFactory;
 import tw.lanyitin.zools.elements.XMLElementFactory;
 import tw.lanyitin.zools.runtime.Environment;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+
 
 public class Main {
-	public static void main(String[] args) throws IOException {
-		ANTLRInputStream in = new ANTLRFileStream(args[0]);
+	public static void main(String[] args) throws IOException, ParseException {
+		Options options = new Options();
+		options.addOption("rule", true, "path of rule file");
+		options.addOption("source", true, "path of data source file");
+		options.addOption("if", true, "format of input file");
+		options.addOption("of", true, "format of output");
+		
+		CommandLineParser cmdParser = new PosixParser(); 
+		CommandLine cmd = cmdParser.parse(options, args);
+		ANTLRInputStream in = new ANTLRFileStream(cmd.getOptionValue("rule"));
         zoolsLexer lexer = new zoolsLexer(in);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         zoolsParser parser = new zoolsParser(tokens);
-        JsonElementFactory jsonElementFactory = new JsonElementFactory();
-        XMLElementFactory xmlElementFactory = new XMLElementFactory();
-		String origin_str = readFromFile(args[1]);
+        ElementFactory<?> inputElementFactory = generateElementFactory(cmd.getOptionValue("if"));
+        ElementFactory<?> outputElementFactory = generateElementFactory(cmd.getOptionValue("of"));
+		String origin_str = readFromFile(cmd.getOptionValue("source"));
         
         ASTGenerator generator = new ASTGenerator();
         ZoolsFile file = (ZoolsFile) generator.visitFile(parser.file());
         Environment e = new Environment(file);
-        Element element = e.process(jsonElementFactory.parse(origin_str));
+        Element element = e.process(inputElementFactory.parse(origin_str));
+        System.out.println("# original format");
         System.out.println(origin_str);
-        System.out.println(xmlElementFactory.convert(element, file.getRules().stream().filter(new Predicate<RuleStmt> () {
+        System.out.println("# new format");
+        System.out.println(outputElementFactory.convert(element, file.getRules().stream().filter(new Predicate<RuleStmt> () {
 			@Override
 			public boolean test(RuleStmt t) {
 				return t.getName().equals("target");
@@ -43,7 +57,15 @@ public class Main {
         }).findFirst().get().getName()));
 	}
 	
-    private static String readFromFile(String filePath)
+    private static ElementFactory<?> generateElementFactory(String optionValue) {
+		if (optionValue.equals("json")) {
+			return new JsonElementFactory();
+		} else {
+			return new XMLElementFactory();
+		}
+	}
+
+	private static String readFromFile(String filePath)
     {
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath)))
