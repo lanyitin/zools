@@ -3,7 +3,6 @@ package tw.lanyitin.zools.elements;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,11 +30,8 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 		} else if (elem instanceof StructElement) {
 			StructElement target = (StructElement) elem;
 			final JsonObject result = new JsonObject();
-			target.getProperties().forEach(new Consumer<Property>() {
-				@Override
-				public void accept(Property t) {
-					result.add(t.getName(), convert(t.getValue()));
-				}
+			target.getProperties().forEach((Property t) -> {
+				result.add(t.getName(), convert(t.getValue()));
 			});
 			return result;
 		} else if (elem instanceof ListElement) {
@@ -70,12 +66,8 @@ public class JsonElementFactory extends ElementFactory<JsonElement> {
 		} else if (element.isJsonObject()) {
 			final List<Property> properties = new ArrayList<Property>();
 			JsonObject obj = element.getAsJsonObject();
-			obj.entrySet().stream().forEach(new Consumer<Entry<String, JsonElement>>() {
-
-				@Override
-				public void accept(Entry<String, JsonElement> t) {
-					properties.add(new Property(t.getKey(), transformToElement(t.getValue())));
-				}
+			obj.entrySet().stream().forEach((Entry<String, JsonElement> t) -> {
+				properties.add(new Property(t.getKey(), transformToElement(t.getValue())));
 			});
 			return new StructElement(null, properties);
 		} else if (element.isJsonArray()) {

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import tw.lanyitin.zools.elements.Element;
 import tw.lanyitin.zools.elements.StructElement;
@@ -47,13 +46,8 @@ public class StructContext extends RuleContext {
 	}
 
 	public void replaceFieldSelecor(final String name, PropertySelector query) {
-		Optional<BindingContext> result = this.bindings.stream().filter(new Predicate<BindingContext>() {
-			@Override
-			public boolean test(BindingContext t) {
-				return t.getQuery().getResolvedName().equals(name);
-			}
-		}).findFirst();
-
+		Optional<BindingContext> result = this.bindings.stream()
+				.filter((BindingContext t) -> t.getQuery().getResolvedName().equals(name)).findFirst();
 		if (result.isPresent()) {
 			BindingContext ctx = result.get();
 			ctx.setQuery(query);

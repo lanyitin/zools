@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 
 import tw.lanyitin.zools.ast.RuleStmt;
 import tw.lanyitin.zools.ast.RuleTypeStmt;
@@ -125,13 +124,7 @@ public class Environment {
 	}
 
 	private void replaceBindingContextQuery(List<Binding> bindings, final StructContext ctx) {
-		bindings.stream().forEach(new Consumer<Binding>() {
-			@Override
-			public void accept(Binding t) {
-				ctx.replaceFieldSelecor(t.getName(), t.getQuery());
-			}
-		});
-
+		bindings.stream().forEach((Binding t) -> ctx.replaceFieldSelecor(t.getName(), t.getQuery()));
 	}
 
 	public RuleContext resolveRule(String name) {

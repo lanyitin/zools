@@ -2,7 +2,6 @@ package tw.lanyitin.zools.ast;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 import tw.lanyitin.zools.runtime.type.Primitive;
 
@@ -42,11 +41,6 @@ public class ZoolsFile extends ASTTree {
 	}
 
 	public RuleStmt resolveRule(final String name) {
-		return this.rules.stream().filter(new Predicate<RuleStmt>() {
-			@Override
-			public boolean test(RuleStmt t) {
-				return t.getName().equals(name);
-			}
-		}).findFirst().get();
+		return this.rules.stream().filter((RuleStmt t) -> t.getName().equals(name)).findFirst().get();
 	}
 }
