@@ -9,4 +9,6 @@ abstract public class PropertySelector {
 
 	public abstract Element getResolveProerpty(StructElement s, Environment env);
 
+	@Override
+	abstract public String toString();
 }

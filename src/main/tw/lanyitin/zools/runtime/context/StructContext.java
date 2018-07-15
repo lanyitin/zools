@@ -1,6 +1,7 @@
 package tw.lanyitin.zools.runtime.context;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import tw.lanyitin.zools.elements.StructElement;
 import tw.lanyitin.zools.runtime.Environment;
 import tw.lanyitin.zools.runtime.Property;
 import tw.lanyitin.zools.runtime.PropertySelector;
+import tw.lanyitin.zools.runtime.ZoolsException;
 import tw.lanyitin.zools.runtime.type.Struct;
 
 public class StructContext extends RuleContext {
@@ -31,16 +33,27 @@ public class StructContext extends RuleContext {
 	}
 
 	@Override
-	public Element process(Element element, Environment env) {
+	public Element process(Element element, Environment env) throws ZoolsException {
 		List<Property> ps = new ArrayList<Property>();
+		List<ZoolsException> errors = new ArrayList<ZoolsException>();
+
 		for (BindingContext ctx : this.bindings) {
 			PropertySelector query = ctx.getQuery();
 			RuleContext property_context = ctx.getContext();
 			Element property = resolveQuery(element, query, env);
-			Property p = new Property(
-					fieldMapping.getOrDefault(ctx.getQuery().getResolvedName(), ctx.getQuery().getResolvedName()),
-					property_context.process(property, env));
-			ps.add(p);
+			try {
+				Property p = new Property(
+						fieldMapping.getOrDefault(ctx.getQuery().getResolvedName(), ctx.getQuery().getResolvedName()),
+						property_context.process(property, env));
+				ps.add(p);
+			} catch (ZoolsException e) {
+				errors.add(new ZoolsException(
+						String.format("'%s:%s'", this.struct.getName(), ctx.getQuery().toString()), Arrays.asList(e)));
+			}
+		}
+
+		if (errors.size() > 0) {
+			throw new ZoolsException("unable to match formaot of following properties", errors);
 		}
 		return new StructElement(this.struct, ps);
 	}

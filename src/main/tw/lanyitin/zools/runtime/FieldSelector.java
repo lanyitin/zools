@@ -31,6 +31,6 @@ public class FieldSelector extends PropertySelector {
 
 	@Override
 	public String toString() {
-		return String.format("FieldSelector[%s]", name);
+		return String.format("%s", name);
 	}
 }

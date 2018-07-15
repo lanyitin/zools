@@ -10,4 +10,9 @@ public class ListType extends Type {
 	public Type getContainedType() {
 		return this.containedType;
 	}
+
+	@Override
+	public String getName() {
+		return String.format("[%s]", containedType.getName());
+	}
 }

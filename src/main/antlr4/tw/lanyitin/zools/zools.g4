@@ -1,5 +1,18 @@
 grammar zools;
 
+@parser::members {
+  private String fileName;
+
+  public zoolsParser(String fileName) throws java.io.IOException {
+    super(new CommonTokenStream(new zoolsLexer(new ANTLRFileStream(fileName))));
+    fileName = fileName;
+  }
+
+  public String getFileName() {
+    return fileName;
+  }
+}
+
 
 TOKEN_NEWLINE: [\n\r]+ -> skip;
 TOKEN_SPACE: [\t ]+  -> skip;

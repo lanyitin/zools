@@ -3,6 +3,7 @@ package tw.lanyitin.zools.runtime.context;
 import tw.lanyitin.zools.elements.Element;
 import tw.lanyitin.zools.runtime.Environment;
 import tw.lanyitin.zools.runtime.PropertySelector;
+import tw.lanyitin.zools.runtime.ZoolsException;
 
 public class BindingContext extends RuleContext {
 	private PropertySelector query;
@@ -23,7 +24,7 @@ public class BindingContext extends RuleContext {
 	}
 
 	@Override
-	public Element process(Element element, Environment env) {
+	public Element process(Element element, Environment env) throws ZoolsException {
 		return property_context.process(element, env);
 	}
 

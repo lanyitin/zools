@@ -3,11 +3,14 @@ package tw.lanyitin.zools.ast;
 import java.util.HashMap;
 import java.util.Map;
 
+import tw.lanyitin.zools.runtime.Location;
+
 public class StructDeclStmt extends ASTTree {
 	private final String name;
 	private final Map<String, String> properties;
 
-	StructDeclStmt(String name) {
+	StructDeclStmt(String name, Location l) {
+		super(l);
 		this.name = name;
 		this.properties = new HashMap<String, String>();
 	}

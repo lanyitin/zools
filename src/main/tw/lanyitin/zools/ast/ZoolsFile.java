@@ -3,6 +3,7 @@ package tw.lanyitin.zools.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import tw.lanyitin.zools.runtime.Location;
 import tw.lanyitin.zools.runtime.type.Primitive;
 
 public class ZoolsFile extends ASTTree {
@@ -10,7 +11,8 @@ public class ZoolsFile extends ASTTree {
 	private final List<StructDeclStmt> structs;
 	private final List<RuleStmt> rules;
 
-	public ZoolsFile() {
+	public ZoolsFile(String file_path) {
+		super(new Location(0, 0, file_path));
 		this.primitives = new ArrayList<Primitive>();
 		this.structs = new ArrayList<StructDeclStmt>();
 		this.rules = new ArrayList<RuleStmt>();

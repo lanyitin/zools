@@ -20,6 +20,7 @@ import tw.lanyitin.zools.elements.ElementFactory;
 import tw.lanyitin.zools.elements.JsonElementFactory;
 import tw.lanyitin.zools.elements.XMLElementFactory;
 import tw.lanyitin.zools.runtime.Environment;
+import tw.lanyitin.zools.runtime.ZoolsException;
 
 public class Main {
 	private static ZoolsFile construct_ast(CommandLine cmd) throws IOException {
@@ -27,8 +28,8 @@ public class Main {
 		zoolsLexer lexer = new zoolsLexer(in);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		zoolsParser parser = new zoolsParser(tokens);
-		ASTGenerator generator = new ASTGenerator();
-		ZoolsFile file = (ZoolsFile) generator.visitFile(parser.file());
+		ASTGenerator generator = new ASTGenerator(parser);
+		ZoolsFile file = generator.process();
 		return file;
 	}
 
@@ -44,16 +45,20 @@ public class Main {
 		CommandLine cmd = setup_cli_args_parser(args);
 
 		ZoolsFile file = construct_ast(cmd);
-		Environment env = new Environment(file);
 
 		ElementFactory<?> inputElementFactory = generateElementFactory(cmd.getOptionValue("if"));
 		ElementFactory<?> outputElementFactory = generateElementFactory(cmd.getOptionValue("of"));
 		String origin_str = readFromFile(cmd.getOptionValue("source"));
-		Element element = env.process(inputElementFactory.parse(origin_str));
-		System.out.println("# original format");
-		System.out.println(origin_str);
-		System.out.println("# new format");
-		System.out.println(outputElementFactory.convert(element));
+		try {
+			Environment env = new Environment(file);
+			Element element = env.process(inputElementFactory.parse(origin_str));
+			System.out.println("# original format");
+			System.out.println(origin_str);
+			System.out.println("# new format");
+			System.out.println(outputElementFactory.convert(element));
+		} catch (ZoolsException e) {
+			System.err.println(e.getMessage());
+		}
 	}
 
 	private static String readFromFile(String filePath) {

@@ -57,4 +57,13 @@ public class CastSelector extends PropertySelector {
 		this.target_rule = text;
 	}
 
+	@Override
+	public String toString() {
+		String result = String.format("%s@%s", this.source.toString(), this.target_rule);
+		if (this.target_field != null) {
+			result += ("." + this.target_field);
+		}
+		return result;
+	}
+
 }

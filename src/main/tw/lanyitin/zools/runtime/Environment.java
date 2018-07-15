@@ -23,22 +23,22 @@ public class Environment {
 	private final HashMap<String, RuleContext> rules;
 	private final HashMap<String, Type> types;
 
-	public Environment(ZoolsFile file) {
+	public Environment(ZoolsFile file) throws ZoolsException {
 		this.rules = new HashMap<String, RuleContext>();
 		this.types = new HashMap<String, Type>();
 		construct(file);
 	}
 
-	private void construct(ZoolsFile file2) {
+	private void construct(ZoolsFile file2) throws ZoolsException {
 		for (Primitive p : file2.getPrimitives()) {
 			if (types.containsKey(p.getName())) {
-				throw new RuntimeException(String.format("duplicate Type '%s'", p.getName()));
+				throw new ZoolsException(String.format("duplicate Type '%s'", p.getName()));
 			}
 			this.types.put(p.getName(), p);
 		}
 		for (StructDeclStmt s : file2.getStructs()) {
 			if (types.containsKey(s.getName())) {
-				throw new RuntimeException(String.format("duplicate Type '%s'", s.getName()));
+				throw new ZoolsException(String.format("duplicate Type '%s'", s.getName()));
 			}
 			this.types.put(s.getName(), new Struct(s.getName()));
 		}
@@ -119,7 +119,7 @@ public class Environment {
 		return this.resolveRule("target");
 	}
 
-	public Element process(Element element) {
+	public Element process(Element element) throws ZoolsException {
 		return this.rules.get("target").process(element, this);
 	}
 

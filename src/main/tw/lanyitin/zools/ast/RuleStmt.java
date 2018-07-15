@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tw.lanyitin.zools.runtime.Binding;
+import tw.lanyitin.zools.runtime.Location;
 
 public class RuleStmt extends ASTTree {
 	private final String name;
 	private final List<Binding> bindings;
 	private RuleTypeStmt targetType;
 
-	public RuleStmt(String name) {
+	public RuleStmt(String name, Location l) {
+		super(l);
 		this.name = name;
 		this.bindings = new ArrayList<Binding>();
 	}
