@@ -10,10 +10,11 @@ public class Property {
 		this.name = name;
 		this.value = element;
 	}
+
 	public String getName() {
 		return this.name;
 	}
-	
+
 	public Element getValue() {
 		return this.value;
 	}

@@ -15,6 +15,14 @@ public class RuleStmt extends ASTTree {
 		this.bindings = new ArrayList<Binding>();
 	}
 
+	public void addBinding(Binding b) {
+		this.bindings.add(b);
+	}
+
+	public List<Binding> getBindings() {
+		return bindings;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -22,16 +30,8 @@ public class RuleStmt extends ASTTree {
 	public RuleTypeStmt getType() {
 		return targetType;
 	}
-	
+
 	public void setType(RuleTypeStmt type) {
 		this.targetType = type;
-	}
-
-	public List<Binding> getBindings() {
-		return bindings;
-	}
-	
-	public void addBinding(Binding b) {
-		this.bindings.add(b);
 	}
 }

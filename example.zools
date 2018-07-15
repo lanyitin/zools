@@ -1,6 +1,6 @@
 //1. Field Format
-//    以正規表達式來描述欄位的格式
-//    語法為： primitive <Name> = /<Regular Expression>/;
+//    using regular expression to specify format of primitive type, such as String, Number, Boolean, and Date
+//    the syntax is： primitive <Name> = /<Regular Expression>/;
 
 primitive Float = /\d+\.\d+/;
 primitive UUID = /[a-zA-Z0-9\-]+/;
@@ -10,13 +10,12 @@ primitive Temperature = /\d+(\.\d+)?/;
 
 
 //2. Data Structure
-//   以類似C的struct來描述不同的資料結構
-//   語法為：
+//   to describe schema of complex type(structure), we can use following syntax
 //   struct <Name> {
 //       <Property Name> : <Property Type>,
 //       ...
 //   }
-//   目前<Property Type>只能用Field Format裡定義，日後打算支援Data Structure
+//	 <Property Type> could be a primitive, struct, and list of type(denote by '[' <Type> ']').
 
 struct LatLng {
 	lat: Float,
@@ -32,20 +31,23 @@ struct ParkingDCU {
 }
 
 //3. Rules
-//   以類似Makefile的寫法來描述受測資料的格式，
-//   名稱為target的goal是整個mapping rule的起始點，代表的是受測資料需符合這個target所描述的rule
-//   語法1為：    target: <Type>
-//   語法2為：    target: <Type>(<Binding Rules>)
-//   <Type>目前可支援Primitive或是Data Structure
-//   <Binding Rules>的語法為 ： <Data Structure 的 Property Name> = <受測資料的Property Name>
+//	 In this section, we need to describe the expected schema of input data by writing rules,
+//   following line is the syntax of a rule:
+//       <rule name>: <Type> '(' <Binding Rule>, ... ')'
+//	 1. Every zools file could have multiple rules, but should have exactly one rule named 'target'.
+//	    the 'target' rule is an entry point of entire format validation and conversion, 
+//   2. <Type> could be a primitive, struct, and list of type(denote by '[' <Type> ']').
+//   3. <Binding Rule> is used in case of input data using different property name,
+//      the syntax on <Binding Rule> is <Structure's Property Name> = <Input Data's Property Name>
+//   4. In case of property is a complex type, we can put a '@'<rule name> after <Input Data's Property Name>
+//        to denote the mapping rule of the property. 
 
 
 location: LatLng(lat = x, lng = y)
 
-//   以下的rule是針對{"id":"a-b-c", "sensor":"b-c-d", "slot_status":true, "timestamp":"2017-07-12T23:19:00.000"}所撰寫
-target: [ParkingDCU(ParkingID     = id,
+target: [ParkingDCU(ParkingID    = id,
                    SenID         = sensor,
                    ParkStatus    = slot_status,
                    RecordTime    = timestamp,
-                   loc            = pos@location
+                   loc           = pos@location
 )]

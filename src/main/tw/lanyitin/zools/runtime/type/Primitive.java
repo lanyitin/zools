@@ -10,12 +10,12 @@ public class Primitive extends Type {
 		this.pattern = pattern;
 		this.name = name;
 	}
-	
-	public Pattern getPattern() {
-		return pattern;
-	}
-	
+
 	public String getName() {
 		return this.name;
+	}
+
+	public Pattern getPattern() {
+		return pattern;
 	}
 }

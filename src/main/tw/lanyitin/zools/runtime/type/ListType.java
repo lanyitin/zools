@@ -6,7 +6,7 @@ public class ListType extends Type {
 	public ListType(Type containedType) {
 		this.containedType = containedType;
 	}
-	
+
 	public Type getContainedType() {
 		return this.containedType;
 	}

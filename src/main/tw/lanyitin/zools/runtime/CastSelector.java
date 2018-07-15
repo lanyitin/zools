@@ -12,21 +12,7 @@ public class CastSelector extends PropertySelector {
 	public CastSelector(PropertySelector source) {
 		this.source = source;
 	}
-	public PropertySelector getSource() {
-		return source;
-	}
-	public void setTargetRule(String text) {
-		this.target_rule = text;
-	}
-	public void setTargetField(String text) {
-		this.target_field = text;
-	}
-	public String getTargetRule() {
-		return this.target_rule;
-	}
-	public String getTargetField() {
-		return this.target_field;
-	}
+
 	@Override
 	public String getResolvedName() {
 		if (target_field != null) {
@@ -35,6 +21,7 @@ public class CastSelector extends PropertySelector {
 			return source.getResolvedName();
 		}
 	}
+
 	@Override
 	public Element getResolveProerpty(StructElement s, Environment env) {
 		Element elem = source.getResolveProerpty(s, env);
@@ -48,6 +35,26 @@ public class CastSelector extends PropertySelector {
 			return null;
 		}
 		return elem;
+	}
+
+	public PropertySelector getSource() {
+		return source;
+	}
+
+	public String getTargetField() {
+		return this.target_field;
+	}
+
+	public String getTargetRule() {
+		return this.target_rule;
+	}
+
+	public void setTargetField(String text) {
+		this.target_field = text;
+	}
+
+	public void setTargetRule(String text) {
+		this.target_rule = text;
 	}
 
 }

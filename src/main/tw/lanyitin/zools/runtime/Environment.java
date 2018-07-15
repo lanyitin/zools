@@ -31,19 +31,19 @@ public class Environment {
 	}
 
 	private void construct(ZoolsFile file2) {
-		for(Primitive p : file2.getPrimitives()) {
+		for (Primitive p : file2.getPrimitives()) {
 			if (types.containsKey(p.getName())) {
 				throw new RuntimeException(String.format("duplicate Type '%s'", p.getName()));
 			}
 			this.types.put(p.getName(), p);
 		}
-		for(StructDeclStmt s : file2.getStructs()) {
+		for (StructDeclStmt s : file2.getStructs()) {
 			if (types.containsKey(s.getName())) {
 				throw new RuntimeException(String.format("duplicate Type '%s'", s.getName()));
 			}
 			this.types.put(s.getName(), new Struct(s.getName()));
 		}
-		for(StructDeclStmt s : file2.getStructs()) {
+		for (StructDeclStmt s : file2.getStructs()) {
 			Struct struct = (Struct) types.get(s.getName());
 			for (Entry<String, String> entry : s.getProperties().entrySet()) {
 				struct.addProperty(entry.getKey(), types.get(entry.getValue()));
@@ -54,11 +54,11 @@ public class Environment {
 			RuleContext result = null;
 			Type type = types.get(typeStmt.getBaseType());
 			if (type instanceof Primitive) {
-				result = new PrimitiveContext(((Primitive) type).getPattern());
+				result = new PrimitiveContext(((Primitive) type));
 			} else {
 				Struct struct = (Struct) type;
 				List<Binding> bindings = generateRawBindings(struct);
-				StructContext ctx = new StructContext(generateBindingContext(struct, bindings));
+				StructContext ctx = new StructContext(struct, generateBindingContext(struct, bindings));
 				result = ctx;
 			}
 			if (typeStmt.isListType()) {
@@ -93,24 +93,16 @@ public class Environment {
 		}
 	}
 
-	private void replaceBindingContextQuery(List<Binding> bindings, final StructContext ctx) {
-		bindings.stream().forEach(new Consumer<Binding>() {
-			public void accept(Binding t) {
-				ctx.replaceFieldSelecor(t.getName(), t.getQuery());
-			}
-		});
-		
-	}
-
 	private List<BindingContext> generateBindingContext(Struct struct, List<Binding> bindings) {
 		List<BindingContext> contexts = new ArrayList<BindingContext>();
-		for(Binding b : bindings) {
+		for (Binding b : bindings) {
 			Type propertyType = struct.getTypeOfProperty(b.getName());
 			if (propertyType instanceof Primitive) {
-				contexts.add(new BindingContext(b.getQuery(), new PrimitiveContext(((Primitive) propertyType).getPattern())));
+				contexts.add(new BindingContext(b.getQuery(), new PrimitiveContext(((Primitive) propertyType))));
 			} else {
 				Struct s = (Struct) propertyType;
-				contexts.add(new BindingContext(b.getQuery(), new StructContext(generateBindingContext(s, generateRawBindings(s)))));
+				contexts.add(new BindingContext(b.getQuery(),
+						new StructContext(s, generateBindingContext(s, generateRawBindings(s)))));
 			}
 		}
 		return contexts;
@@ -118,18 +110,32 @@ public class Environment {
 
 	private List<Binding> generateRawBindings(Struct struct) {
 		List<Binding> bindings = new ArrayList<Binding>();
-		for(Entry<String, Type> entry : struct.getProperties().entrySet()) {
+		for (Entry<String, Type> entry : struct.getProperties().entrySet()) {
 			bindings.add(new Binding(entry.getKey(), new FieldSelector(entry.getKey())));
 		}
 		return bindings;
 	}
 
+	public RuleContext getTargetRule() {
+		return this.resolveRule("target");
+	}
+
 	public Element process(Element element) {
 		return this.rules.get("target").process(element, this);
 	}
-	
+
+	private void replaceBindingContextQuery(List<Binding> bindings, final StructContext ctx) {
+		bindings.stream().forEach(new Consumer<Binding>() {
+			@Override
+			public void accept(Binding t) {
+				ctx.replaceFieldSelecor(t.getName(), t.getQuery());
+			}
+		});
+
+	}
+
 	public RuleContext resolveRule(String name) {
 		return this.rules.get(name);
 	}
-	
+
 }

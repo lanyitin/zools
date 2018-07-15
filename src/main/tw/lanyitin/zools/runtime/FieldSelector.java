@@ -9,7 +9,7 @@ public class FieldSelector extends PropertySelector {
 	public FieldSelector(String name) {
 		this.name = name;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
@@ -28,7 +28,7 @@ public class FieldSelector extends PropertySelector {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("FieldSelector[%s]", name);

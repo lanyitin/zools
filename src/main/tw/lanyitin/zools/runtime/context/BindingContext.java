@@ -9,29 +9,26 @@ public class BindingContext extends RuleContext {
 	private RuleContext property_context;
 
 	public BindingContext(PropertySelector query, RuleContext context) {
+		super(context.getType());
 		this.query = query;
 		this.property_context = context;
 	}
-	@Override
-	public boolean match(Element element, Environment env) {
-		return property_context.match(element, env);
+
+	public RuleContext getContext() {
+		return property_context;
 	}
 
-	@Override
-	public Element convert(Element element, Environment env) {
-		return property_context.convert(element, env);
-	}
 	public PropertySelector getQuery() {
 		return query;
 	}
+
+	@Override
+	public Element process(Element element, Environment env) {
+		return property_context.process(element, env);
+	}
+
 	public void setQuery(PropertySelector query2) {
 		this.query = query2;
-	}
-	public void setContext(RuleContext context) {
-		this.property_context = context;
-	}
-	public RuleContext getContext() {
-		return property_context;
 	}
 
 }

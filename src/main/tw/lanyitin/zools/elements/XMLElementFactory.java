@@ -1,11 +1,13 @@
 package tw.lanyitin.zools.elements;
 
 import java.io.ByteArrayInputStream;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Node;
+
 import org.json.JSONTokener;
 import org.json.XML;
+import org.w3c.dom.Node;
 
 public class XMLElementFactory extends ElementFactory<Node> {
 	private final JsonElementFactory jsonFactory;
@@ -13,14 +15,10 @@ public class XMLElementFactory extends ElementFactory<Node> {
 	public XMLElementFactory() {
 		this.jsonFactory = new JsonElementFactory();
 	}
-	@Override
-	public Element parse(String str) {
-		return jsonFactory.parse(XML.toJSONObject(str).toString());
-	}
 
 	@Override
-	public Node convert(Element elem, final String tabName) {
-		String xmlStr = XML.toString((new JSONTokener(jsonFactory.convert(elem, null).toString())).nextValue());
+	public Node convert(Element elem) {
+		String xmlStr = XML.toString((new JSONTokener(jsonFactory.convert(elem).toString())).nextValue());
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
@@ -30,5 +28,10 @@ public class XMLElementFactory extends ElementFactory<Node> {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@Override
+	public Element parse(String str) {
+		return jsonFactory.parse(XML.toJSONObject(str).toString());
 	}
 }

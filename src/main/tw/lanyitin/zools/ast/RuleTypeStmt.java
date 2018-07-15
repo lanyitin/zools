@@ -10,6 +10,10 @@ public class RuleTypeStmt extends ASTTree {
 		this.isListType = false;
 	}
 
+	public String getBaseType() {
+		return baseType;
+	}
+
 	public boolean isListType() {
 		return isListType;
 	}
@@ -17,11 +21,5 @@ public class RuleTypeStmt extends ASTTree {
 	public void setListType(boolean isListType) {
 		this.isListType = isListType;
 	}
-
-	public String getBaseType() {
-		return baseType;
-	}
-	
-	
 
 }

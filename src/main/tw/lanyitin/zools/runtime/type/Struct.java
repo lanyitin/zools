@@ -10,28 +10,29 @@ public class Struct extends Type {
 	public Struct(String name) {
 		this(name, new HashMap<String, Type>());
 	}
-	
-	public Struct(String name, Map<String, Type> properties) {
+
+	private Struct(String name, Map<String, Type> properties) {
 		this.properties = properties;
 		this.name = name;
 	}
-	
-	public Map<String, Type> getProperties() {
-		return this.properties;
-	}
-	
-	public String getName() {
-		return this.name;
-	}
+
 	public void addProperty(String name, Type type) {
 		this.properties.put(name, type);
 	}
-	
-	public boolean hasProperty(String key) {
-		return properties.containsKey(key);
+
+	public String getName() {
+		return this.name;
 	}
-	
+
+	public Map<String, Type> getProperties() {
+		return this.properties;
+	}
+
 	public Type getTypeOfProperty(String key) {
 		return properties.get(key);
+	}
+
+	public boolean hasProperty(String key) {
+		return properties.containsKey(key);
 	}
 }
