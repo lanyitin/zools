@@ -1,4 +1,1 @@
-[
-	{"id":"a-b-c", "sensor":"b-c-d", "slot_status":true, "timestamp":"2017-07-12T23:19:00.000", "pos": {"x": 1.0, "y": 2.0}},
-	{"id":"a-b-c-d", "sensor":"b-c-d-e", "slot_status":false, "timestamp":"2017-07-12T23:19:30.000", "pos": {"x": 1.0, "y": 2.0}}
-]
+[{"id":"a-b-c", "sensor":"b-c-d", "slot_status":true, "timestamp":"2017-07-12T23:19:00.000", "pos": {"x": 1.0, "y": 2.0}}]

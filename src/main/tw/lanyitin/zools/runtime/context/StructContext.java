@@ -5,45 +5,79 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Map.Entry;
 
 import tw.lanyitin.zools.elements.Element;
 import tw.lanyitin.zools.elements.StructElement;
-import tw.lanyitin.zools.runtime.Environment;
+import tw.lanyitin.zools.runtime.Binding;
+import tw.lanyitin.zools.runtime.CastSelector;
+import tw.lanyitin.zools.runtime.Engine;
 import tw.lanyitin.zools.runtime.Property;
 import tw.lanyitin.zools.runtime.PropertySelector;
 import tw.lanyitin.zools.runtime.ZoolsException;
 import tw.lanyitin.zools.runtime.type.Struct;
+import tw.lanyitin.zools.runtime.type.Type;
 
 public class StructContext extends RuleContext {
-
-	private final List<BindingContext> bindings;
-	private final Map<String, String> fieldMapping;
 	private final Struct struct;
+	private final HashMap<PropertySelector, PropertySelector> fieldMapping;
 
-	public StructContext(Struct struct, List<BindingContext> bindings) {
+	public StructContext(Struct struct) {
 		super(struct);
+		if (struct == null) {
+			throw new RuntimeException();
+		}
 		this.struct = struct;
-		this.bindings = bindings;
-		this.fieldMapping = new HashMap<String, String>();
+		this.fieldMapping = new HashMap<PropertySelector, PropertySelector>();
+	}	
+	
+	public StructContext(Struct struct, List<Binding> bindings) {
+		this(struct);
+		this.setBindings(bindings);
 	}
 
-	public List<BindingContext> getBindingContexts() {
-		return bindings;
+	public void setBindings(List<Binding> bindings) {
+		for (Binding b : bindings) {
+			fieldMapping.put(b.getName(), b.getQuery());
+		}
+	}
+	
+	public Map<PropertySelector, PropertySelector> getReversedBinding() {
+		Map<PropertySelector, PropertySelector> result = new HashMap<PropertySelector, PropertySelector>();
+		for(Entry<PropertySelector, PropertySelector> entry : this.fieldMapping.entrySet()) {
+			result.put(entry.getValue(), entry.getKey());
+		}
+		return result;
+	}
+	
+	public List<BindingContext> getBindingContexts(Engine env) throws ZoolsException {
+		List<BindingContext> result = new ArrayList<BindingContext>();
+		for (Entry<PropertySelector, Type> entry : this.struct.getProperties().entrySet()) {
+			PropertySelector property = this.fieldMapping.getOrDefault(entry.getKey(), entry.getKey());
+			RuleContext context = entry.getValue().generateContext();
+			if (property instanceof CastSelector) {
+				CastSelector cs = (CastSelector) property;
+				if (cs.getTargetField() == null) {
+					context = (StructContext) env.resolveRule(cs.getTargetRule());
+				}
+			}
+			result.add(new BindingContext(property, context));
+		}
+		return result;
 	}
 
 	@Override
-	public Element process(Element element, Environment env) throws ZoolsException {
+	public Element process(Element element, Engine env) throws ZoolsException {
 		List<Property> ps = new ArrayList<Property>();
 		List<ZoolsException> errors = new ArrayList<ZoolsException>();
-
-		for (BindingContext ctx : this.bindings) {
+		List<BindingContext> bindingContexts = this.getBindingContexts(env);
+		for (BindingContext ctx : bindingContexts) {
 			PropertySelector query = ctx.getQuery();
 			RuleContext property_context = ctx.getContext();
-			Element property = resolveQuery(element, query, env);
 			try {
+				Element property = resolveQuery(element, query, env);
 				Property p = new Property(
-						fieldMapping.getOrDefault(ctx.getQuery().getResolvedName(), ctx.getQuery().getResolvedName()),
+						this.getReversedBinding().getOrDefault(ctx.getQuery(), ctx.getQuery()).getResolvedName(),
 						property_context.process(property, env));
 				ps.add(p);
 			} catch (ZoolsException e) {
@@ -53,24 +87,23 @@ public class StructContext extends RuleContext {
 		}
 
 		if (errors.size() > 0) {
-			throw new ZoolsException("unable to match formaot of following properties", errors);
+			throw new ZoolsException("unable to match format of following properties", errors);
 		}
 		return new StructElement(this.struct, ps);
 	}
 
-	public void replaceFieldSelecor(final String name, PropertySelector query) {
-		Optional<BindingContext> result = this.bindings.stream()
-				.filter((BindingContext t) -> t.getQuery().getResolvedName().equals(name)).findFirst();
-		if (result.isPresent()) {
-			BindingContext ctx = result.get();
-			ctx.setQuery(query);
-			this.fieldMapping.put(query.getResolvedName(), name);
-		}
-	}
-
-	private Element resolveQuery(Element element, PropertySelector query, Environment env) {
+	private Element resolveQuery(Element element, PropertySelector query, Engine env) throws ZoolsException {
 		StructElement s = (StructElement) element;
-		return query.getResolveProerpty(s, env);
+		Element result = query.getResolveProerpty(s, env);
+		if (result == null) {
+			throw new ZoolsException(String.format("missing property: %s in %s", query.getResolvedName(), element.toString()));
+		}
+		return result;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("%s{%s}", struct != null ? struct.getName() : "", this.getReversedBinding().entrySet().stream().map(x -> x.toString()).reduce( (a, b) -> a +", " + b).orElse(""));
 	}
 
 }

@@ -17,5 +17,10 @@ public class PrimitiveElement<T extends Object> extends Element {
 	public String getRepr() {
 		return this.content.toString();
 	}
+	
+	@Override
+	public String toString() {
+		return this.getRepr();
+	}
 
 }

@@ -5,6 +5,43 @@ import tw.lanyitin.zools.elements.StructElement;
 
 public class CastSelector extends PropertySelector {
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((source == null) ? 0 : source.hashCode());
+		result = prime * result + ((target_field == null) ? 0 : target_field.hashCode());
+		result = prime * result + ((target_rule == null) ? 0 : target_rule.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CastSelector other = (CastSelector) obj;
+		if (source == null) {
+			if (other.source != null)
+				return false;
+		} else if (!source.equals(other.source))
+			return false;
+		if (target_field == null) {
+			if (other.target_field != null)
+				return false;
+		} else if (!target_field.equals(other.target_field))
+			return false;
+		if (target_rule == null) {
+			if (other.target_rule != null)
+				return false;
+		} else if (!target_rule.equals(other.target_rule))
+			return false;
+		return true;
+	}
+
 	private final PropertySelector source;
 	private String target_rule;
 	private String target_field;
@@ -23,7 +60,7 @@ public class CastSelector extends PropertySelector {
 	}
 
 	@Override
-	public Element getResolveProerpty(StructElement s, Environment env) {
+	public Element getResolveProerpty(StructElement s, Engine env) {
 		Element elem = source.getResolveProerpty(s, env);
 		if (this.target_field != null) {
 			StructElement sc = (StructElement) elem;

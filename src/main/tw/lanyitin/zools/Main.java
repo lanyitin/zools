@@ -19,7 +19,7 @@ import tw.lanyitin.zools.elements.Element;
 import tw.lanyitin.zools.elements.ElementFactory;
 import tw.lanyitin.zools.elements.JsonElementFactory;
 import tw.lanyitin.zools.elements.XMLElementFactory;
-import tw.lanyitin.zools.runtime.Environment;
+import tw.lanyitin.zools.runtime.Engine;
 import tw.lanyitin.zools.runtime.ZoolsException;
 
 public class Main {
@@ -50,7 +50,7 @@ public class Main {
 		ElementFactory<?> outputElementFactory = generateElementFactory(cmd.getOptionValue("of"));
 		String origin_str = readFromFile(cmd.getOptionValue("source"));
 		try {
-			Environment env = new Environment(file);
+			Engine env = new Engine(file);
 			Element element = env.process(inputElementFactory.parse(origin_str));
 			System.out.println("# original format");
 			System.out.println(origin_str);

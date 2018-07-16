@@ -6,16 +6,21 @@ import java.util.List;
 
 import tw.lanyitin.zools.elements.Element;
 import tw.lanyitin.zools.elements.ListElement;
-import tw.lanyitin.zools.runtime.Environment;
+import tw.lanyitin.zools.runtime.Engine;
 import tw.lanyitin.zools.runtime.ZoolsException;
 import tw.lanyitin.zools.runtime.type.ListType;
 
 public class ListContext extends RuleContext {
 	private RuleContext base_context;
 
-	public ListContext(RuleContext child_context) {
-		super(new ListType(child_context.getType()));
-		this.base_context = child_context;
+	public ListContext(ListType t) {
+		super(t);
+		this.base_context = t.getContainedType().generateContext();
+	}
+	
+	public ListContext(RuleContext t) {
+		super(new ListType(t.getType()));
+		this.base_context = t;
 	}
 
 	public RuleContext getBaseContext() {
@@ -23,7 +28,7 @@ public class ListContext extends RuleContext {
 	}
 
 	@Override
-	public Element process(Element element, final Environment env) throws ZoolsException {
+	public Element process(Element element, final Engine env) throws ZoolsException {
 		if (!(element instanceof ListElement)) {
 			throw new ZoolsException(
 					String.format("expected as ListElement, but actually got: '%s'", element.getClass().getName()));
@@ -43,6 +48,11 @@ public class ListContext extends RuleContext {
 			throw new ZoolsException("unable to match following childs:", errors);
 		}
 		return new ListElement(target.getListType(), new_childs);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("[%s]", this.base_context.toString());
 	}
 
 }

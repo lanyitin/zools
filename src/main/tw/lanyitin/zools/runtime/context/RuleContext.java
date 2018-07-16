@@ -1,7 +1,7 @@
 package tw.lanyitin.zools.runtime.context;
 
 import tw.lanyitin.zools.elements.Element;
-import tw.lanyitin.zools.runtime.Environment;
+import tw.lanyitin.zools.runtime.Engine;
 import tw.lanyitin.zools.runtime.ZoolsException;
 import tw.lanyitin.zools.runtime.type.Type;
 
@@ -16,5 +16,8 @@ abstract public class RuleContext {
 		return this.type;
 	}
 
-	abstract public Element process(Element element, Environment env) throws ZoolsException;
+	abstract public Element process(Element element, Engine env) throws ZoolsException;
+	
+	@Override
+	abstract public String toString();
 }

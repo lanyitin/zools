@@ -46,14 +46,15 @@ public class ASTGenerator {
 		@Override
 		public ASTTree visitList_type(zoolsParser.List_typeContext ctx) {
 			visitChildren(ctx);
-			ruleTargetType.setListType(true);
+			Interval sourceInterval = ctx.TOKEN_LBRACKET().getSourceInterval();
+			ruleTargetType = new ListTypeStmt(ruleTargetType, new Location(sourceInterval.a, sourceInterval.b, filePath));
 			return ruleTargetType;
 		}
 
 		@Override
 		public ASTTree visitMapping(zoolsParser.MappingContext ctx) {
 			visitChildren(ctx);
-			this.rule.addBinding(new Binding(ctx.TOKEN_IDENTIFIER().getText(), this.propertyQuery));
+			this.rule.addBinding(new Binding(new FieldSelector(ctx.TOKEN_IDENTIFIER().getText()), this.propertyQuery));
 			return null;
 		}
 
@@ -72,7 +73,11 @@ public class ASTGenerator {
 			visitChildren(ctx);
 			TerminalNode token = ctx.TOKEN_IDENTIFIER();
 			Interval si = token.getSourceInterval();
-			this.ruleTargetType = new RuleTypeStmt(token.getText(), new Location(si.a, si.b, filePath));
+			if (ctx.mappings() == null || ctx.mappings().isEmpty()) {
+				this.ruleTargetType =  new PrimitiveTypeStmt(token.getText(), new Location(si.a, si.b, filePath));
+			} else {
+				this.ruleTargetType =  new StructTypeStmt(token.getText(), new Location(si.a, si.b, filePath));
+			}
 			return ruleTargetType;
 		}
 

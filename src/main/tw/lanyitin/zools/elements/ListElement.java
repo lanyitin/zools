@@ -21,4 +21,10 @@ public class ListElement extends Element {
 	public ListType getListType() {
 		return this.type;
 	}
+
+	@Override
+	public String toString() {
+		return "[" + this.childs.stream().
+				map(x -> x.toString()).reduce((a, b) -> {return  a + ", " + b;}).orElse("") + "]";
+	}
 }

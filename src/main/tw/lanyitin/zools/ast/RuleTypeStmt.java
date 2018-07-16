@@ -2,27 +2,21 @@ package tw.lanyitin.zools.ast;
 
 import tw.lanyitin.zools.runtime.Location;
 
-public class RuleTypeStmt extends ASTTree {
+public abstract class RuleTypeStmt extends ASTTree {
 
-	private final String baseType;
-	private boolean isListType;
+	private String name;
 
 	public RuleTypeStmt(String text, Location l) {
 		super(l);
-		this.baseType = text;
-		this.isListType = false;
+		this.name = text;
+	}
+	
+	public String getName() {
+		return this.name;
 	}
 
-	public String getBaseType() {
-		return baseType;
-	}
-
-	public boolean isListType() {
-		return isListType;
-	}
-
-	public void setListType(boolean isListType) {
-		this.isListType = isListType;
-	}
-
+	public abstract RuleTypeStmt getBaseType();
+	public abstract boolean isListType();
+	public abstract boolean isStructType();
+	public abstract boolean isPrimitiveType();
 }

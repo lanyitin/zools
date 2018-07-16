@@ -1,6 +1,7 @@
 package tw.lanyitin.zools.runtime.type;
 
 import tw.lanyitin.zools.runtime.Location;
+import tw.lanyitin.zools.runtime.context.RuleContext;
 
 public abstract class Type {
 	private Location location;
@@ -11,4 +12,6 @@ public abstract class Type {
 		return location;
 	}
 	abstract public String getName();
+	
+	abstract public RuleContext generateContext();
 }

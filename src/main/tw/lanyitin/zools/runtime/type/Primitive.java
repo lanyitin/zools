@@ -2,6 +2,9 @@ package tw.lanyitin.zools.runtime.type;
 
 import java.util.regex.Pattern;
 
+import tw.lanyitin.zools.runtime.context.PrimitiveContext;
+import tw.lanyitin.zools.runtime.context.RuleContext;
+
 public class Primitive extends Type {
 	private final Pattern pattern;
 	private final String name;
@@ -17,5 +20,10 @@ public class Primitive extends Type {
 
 	public Pattern getPattern() {
 		return pattern;
+	}
+
+	@Override
+	public RuleContext generateContext() {
+		return new PrimitiveContext(this);
 	}
 }

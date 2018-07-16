@@ -3,20 +3,20 @@ package tw.lanyitin.zools.runtime.type;
 import java.util.HashMap;
 import java.util.Map;
 
+import tw.lanyitin.zools.runtime.PropertySelector;
+import tw.lanyitin.zools.runtime.context.RuleContext;
+import tw.lanyitin.zools.runtime.context.StructContext;
+
 public class Struct extends Type {
-	private final Map<String, Type> properties;
+	private final Map<PropertySelector, Type> properties;
 	private final String name;
 
 	public Struct(String name) {
-		this(name, new HashMap<String, Type>());
-	}
-
-	private Struct(String name, Map<String, Type> properties) {
-		this.properties = properties;
+		this.properties = new HashMap<PropertySelector, Type>();
 		this.name = name;
 	}
 
-	public void addProperty(String name, Type type) {
+	public void addProperty(PropertySelector name, Type type) {
 		this.properties.put(name, type);
 	}
 
@@ -24,15 +24,20 @@ public class Struct extends Type {
 		return this.name;
 	}
 
-	public Map<String, Type> getProperties() {
+	public Map<PropertySelector, Type> getProperties() {
 		return this.properties;
 	}
 
-	public Type getTypeOfProperty(String key) {
+	public Type getTypeOfProperty(PropertySelector key) {
 		return properties.get(key);
 	}
 
-	public boolean hasProperty(String key) {
+	public boolean hasProperty(PropertySelector key) {
 		return properties.containsKey(key);
+	}
+
+	@Override
+	public RuleContext generateContext() {
+		return new StructContext(this);
 	}
 }

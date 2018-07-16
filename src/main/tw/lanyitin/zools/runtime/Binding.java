@@ -1,15 +1,15 @@
 package tw.lanyitin.zools.runtime;
 
 public class Binding {
-	private final String name;
+	private final PropertySelector name;
 	private final PropertySelector query;
 
-	public Binding(String lValue, PropertySelector rValue) {
+	public Binding(PropertySelector lValue, PropertySelector rValue) {
 		this.name = lValue;
 		this.query = rValue;
 	}
 
-	public String getName() {
+	public PropertySelector getName() {
 		return name;
 	}
 

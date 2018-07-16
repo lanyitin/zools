@@ -11,6 +11,9 @@ public class StructElement extends Element {
 
 	public StructElement(Struct struct, List<Property> properties) {
 		super(struct);
+//		if (struct == null) {
+//			throw new IllegalArgumentException("struct shouldn't be null");
+//		}
 		this.properties = properties;
 		this.struct = struct;
 	}
@@ -25,5 +28,11 @@ public class StructElement extends Element {
 
 	public void putProperty(Property p) {
 		this.properties.add(p);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("{%s}",
+				this.properties.stream().map(x -> x.getName() + ":" + x.getValue().toString()).reduce((a, b) -> a + ", " + b).orElse(""));
 	}
 }
