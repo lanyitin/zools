@@ -31,10 +31,10 @@ public class BindingContext extends RuleContext {
 	public void setQuery(PropertySelector query2) {
 		this.query = query2;
 	}
-	
+
 	@Override
 	public String toString() {
-		return String.format("%s = %s", query.toString(), property_context.toString());
+		return String.format("%s = %s", property_context.toString(), query.toString());
 	}
 
 }

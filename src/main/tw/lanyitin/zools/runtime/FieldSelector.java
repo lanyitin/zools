@@ -31,7 +31,8 @@ public class FieldSelector extends PropertySelector {
 
 	private final String name;
 
-	public FieldSelector(String name) {
+	public FieldSelector(String name, Boolean optional) {
+		super(optional);
 		this.name = name;
 	}
 

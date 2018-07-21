@@ -12,7 +12,7 @@ public abstract class Element {
 	public Type getType() {
 		return this.type;
 	}
-	
+
 	@Override
 	public abstract String toString();
 }

@@ -17,11 +17,6 @@ public class ListContext extends RuleContext {
 		super(t);
 		this.base_context = t.getContainedType().generateContext();
 	}
-	
-	public ListContext(RuleContext t) {
-		super(new ListType(t.getType()));
-		this.base_context = t;
-	}
 
 	public RuleContext getBaseContext() {
 		return this.base_context;
@@ -41,7 +36,8 @@ public class ListContext extends RuleContext {
 			try {
 				new_childs.add(base_context.process(child, env));
 			} catch (ZoolsException e) {
-				errors.add(new ZoolsException(String.format("%dth child:", target.getChilds().indexOf(child) + 1),  Arrays.asList(e)));
+				errors.add(new ZoolsException(String.format("%dth child:", target.getChilds().indexOf(child) + 1),
+						Arrays.asList(e)));
 			}
 		}
 		if (errors.size() > 0) {

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import tw.lanyitin.zools.elements.Element;
 import tw.lanyitin.zools.elements.StructElement;
@@ -29,8 +30,8 @@ public class StructContext extends RuleContext {
 		}
 		this.struct = struct;
 		this.fieldMapping = new HashMap<PropertySelector, PropertySelector>();
-	}	
-	
+	}
+
 	public StructContext(Struct struct, List<Binding> bindings) {
 		this(struct);
 		this.setBindings(bindings);
@@ -41,15 +42,15 @@ public class StructContext extends RuleContext {
 			fieldMapping.put(b.getName(), b.getQuery());
 		}
 	}
-	
+
 	public Map<PropertySelector, PropertySelector> getReversedBinding() {
 		Map<PropertySelector, PropertySelector> result = new HashMap<PropertySelector, PropertySelector>();
-		for(Entry<PropertySelector, PropertySelector> entry : this.fieldMapping.entrySet()) {
+		for (Entry<PropertySelector, PropertySelector> entry : this.fieldMapping.entrySet()) {
 			result.put(entry.getValue(), entry.getKey());
 		}
 		return result;
 	}
-	
+
 	public List<BindingContext> getBindingContexts(Engine env) throws ZoolsException {
 		List<BindingContext> result = new ArrayList<BindingContext>();
 		for (Entry<PropertySelector, Type> entry : this.struct.getProperties().entrySet()) {
@@ -75,11 +76,13 @@ public class StructContext extends RuleContext {
 			PropertySelector query = ctx.getQuery();
 			RuleContext property_context = ctx.getContext();
 			try {
-				Element property = resolveQuery(element, query, env);
-				Property p = new Property(
-						this.getReversedBinding().getOrDefault(ctx.getQuery(), ctx.getQuery()).getResolvedName(),
-						property_context.process(property, env));
-				ps.add(p);
+				Optional<Element> property = resolveQuery(element, query, env, query.isOptional());
+				if (property.isPresent()) {
+					Property p = new Property(
+							this.getReversedBinding().getOrDefault(ctx.getQuery(), ctx.getQuery()).getResolvedName(),
+							property_context.process(property.get(), env));
+					ps.add(p);
+				}
 			} catch (ZoolsException e) {
 				errors.add(new ZoolsException(
 						String.format("'%s:%s'", this.struct.getName(), ctx.getQuery().toString()), Arrays.asList(e)));
@@ -92,18 +95,21 @@ public class StructContext extends RuleContext {
 		return new StructElement(this.struct, ps);
 	}
 
-	private Element resolveQuery(Element element, PropertySelector query, Engine env) throws ZoolsException {
+	private Optional<Element> resolveQuery(Element element, PropertySelector query, Engine env, boolean optional)
+			throws ZoolsException {
 		StructElement s = (StructElement) element;
 		Element result = query.getResolveProerpty(s, env);
-		if (result == null) {
-			throw new ZoolsException(String.format("missing property: %s in %s", query.getResolvedName(), element.toString()));
+		if (result == null && !optional) {
+			throw new ZoolsException(
+					String.format("missing property: %s in %s", query.getResolvedName(), element.toString()));
 		}
-		return result;
+		return Optional.ofNullable(result);
 	}
-	
+
 	@Override
 	public String toString() {
-		return String.format("%s{%s}", struct != null ? struct.getName() : "", this.getReversedBinding().entrySet().stream().map(x -> x.toString()).reduce( (a, b) -> a +", " + b).orElse(""));
+		return String.format("%s{%s}", struct != null ? struct.getName() : "", this.getReversedBinding().entrySet()
+				.stream().map(x -> x.toString()).reduce((a, b) -> a + ", " + b).orElse(""));
 	}
 
 }

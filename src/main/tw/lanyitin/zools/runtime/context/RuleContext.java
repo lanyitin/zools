@@ -17,7 +17,7 @@ abstract public class RuleContext {
 	}
 
 	abstract public Element process(Element element, Engine env) throws ZoolsException;
-	
+
 	@Override
 	abstract public String toString();
 }

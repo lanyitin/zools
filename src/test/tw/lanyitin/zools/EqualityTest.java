@@ -10,9 +10,9 @@ public class EqualityTest {
 
 	@Test
 	public void fieldSelectorEqualityTest() {
-		FieldSelector fsa = new FieldSelector("a");
-		FieldSelector fsb = new FieldSelector("b");
-		FieldSelector fsc = new FieldSelector("a");
+		FieldSelector fsa = new FieldSelector("a", true);
+		FieldSelector fsb = new FieldSelector("b", true);
+		FieldSelector fsc = new FieldSelector("a", true);
 		assertTrue(fsa.equals(fsc));
 		assertTrue(!fsa.equals(fsb));
 	}

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import tw.lanyitin.zools.ast.ListTypeStmt;
 import tw.lanyitin.zools.ast.PrimitiveTypeStmt;
 import tw.lanyitin.zools.ast.RuleStmt;
@@ -34,11 +36,11 @@ public class Engine {
 		this.bindingMap = new HashMap<String, List<Binding>>();
 		construct(file);
 	}
-	
+
 	public void addBinding(String name, List<Binding> bindings) {
 		this.bindingMap.put(name, bindings);
 	}
-	
+
 	public List<Binding> getBindings(String name) {
 		return this.bindingMap.get(name);
 	}
@@ -61,19 +63,20 @@ public class Engine {
 		// iterate through StructDeclStmt for fill up missing information in Structs
 		for (StructDeclStmt s : file2.getStructs()) {
 			Struct struct = (Struct) types.get(s.getName());
-			for (Entry<String, String> entry : s.getProperties().entrySet()) {
-				struct.addProperty(new FieldSelector(entry.getKey()), types.get(entry.getValue()));
+			for (Entry<String, Pair<String, Boolean>> entry : s.getProperties().entrySet()) {
+				struct.addProperty(new FieldSelector(entry.getKey(), entry.getValue().getRight()),
+						types.get(entry.getValue().getLeft()));
 			}
 		}
-		
+
 		// find all rules and put it into global scope
 		for (RuleStmt r : file2.getRules()) {
 			if (this.rules.containsKey(r.getName())) {
-				throw new ZoolsException(String.format("duplicate rule '%s'", r.getName()));				
+				throw new ZoolsException(String.format("duplicate rule '%s'", r.getName()));
 			}
 			RuleTypeStmt typeStmt = r.getType();
 			RuleContext result = null;
-			
+
 			if (typeStmt instanceof PrimitiveTypeStmt) {
 				Primitive type = (Primitive) types.get(typeStmt.getName());
 				result = new PrimitiveContext(type);
@@ -89,7 +92,7 @@ public class Engine {
 			}
 			this.rules.put(r.getName(), result);
 		}
-		
+
 		// doing rule semantic analysis
 		for (RuleStmt r : file2.getRules()) {
 			RuleTypeStmt typeStmt = r.getType();
@@ -104,11 +107,12 @@ public class Engine {
 			}
 		}
 	}
-	
-	private void addBindingsToListContext(ListContext lc, List<Binding> bindings, ZoolsFile file2) throws ZoolsException {
+
+	private void addBindingsToListContext(ListContext lc, List<Binding> bindings, ZoolsFile file2)
+			throws ZoolsException {
 		RuleContext rc = lc;
 		while (rc instanceof ListContext) {
-			rc = lc.getBaseContext();
+			rc = ((ListContext) rc).getBaseContext();
 		}
 		if (rc instanceof StructContext) {
 			StructContext sc = (StructContext) rc;
@@ -120,14 +124,15 @@ public class Engine {
 		RuleTypeStmt childStmt = stmt.getBaseType();
 		Type t;
 		if (childStmt.isListType()) {
-			t = solveNestedListType((ListTypeStmt)childStmt);
+			t = solveNestedListType((ListTypeStmt) childStmt);
 		} else {
 			t = this.types.get(childStmt.getName());
 		}
 		return new ListType(t);
 	}
 
-	private void addBindingToStructContext(StructContext sc, List<Binding> bindings, ZoolsFile file2) throws ZoolsException {
+	private void addBindingToStructContext(StructContext sc, List<Binding> bindings, ZoolsFile file2)
+			throws ZoolsException {
 		sc.setBindings(bindings);
 		for (BindingContext bs : sc.getBindingContexts(this)) {
 			if (bs.getQuery() instanceof CastSelector) {
@@ -136,18 +141,19 @@ public class Engine {
 				RuleStmt resolveRuleContext = file2.resolveRule(cs.getTargetRule());
 				List<Binding> subbindings = null;
 				if (cs.getTargetField() != null) {
-					subbindings = Arrays.asList(resolveRuleContext.getBindings().stream().filter(t -> t.getQuery().getResolvedName().equals(cs.getTargetField())));			
+					subbindings = Arrays.asList(resolveRuleContext.getBindings().stream()
+							.filter(t -> t.getQuery().getResolvedName().equals(cs.getTargetField())));
 				} else {
 					subbindings = resolveRuleContext.getBindings();
 				}
 				addBindingToStructContext(sc2, subbindings, file2);
 			}
-		}		
+		}
 	}
 
 	public Element process(Element element) throws ZoolsException {
 		return resolveTargetRule().process(element, this);
-	}	
+	}
 
 	public RuleContext resolveTargetRule() throws ZoolsException {
 		return this.resolveRule("target");

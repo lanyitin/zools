@@ -16,16 +16,20 @@ public class ZoolsException extends Exception {
 		super(msg);
 		sub_exception = e;
 	}
-	
+
 	@Override
 	public String getMessage() {
 		String msg = super.getMessage();
 		if (this.sub_exception == null) {
 			return msg;
 		} else {
-			String childMsg = this.sub_exception.stream().map((ZoolsException e) -> e.getMessage()).reduce((a, b) -> a + "\n" + b).get();
-			childMsg = Arrays.asList(childMsg.split("[\r\n]+")).stream().
-			map((String s) -> {return "  " + s;}).reduce((String a, String b) -> {return a + "\n" + b;}).get();
+			String childMsg = this.sub_exception.stream().map((ZoolsException e) -> e.getMessage())
+					.reduce((a, b) -> a + "\n" + b).get();
+			childMsg = Arrays.asList(childMsg.split("[\r\n]+")).stream().map((String s) -> {
+				return "  " + s;
+			}).reduce((String a, String b) -> {
+				return a + "\n" + b;
+			}).get();
 			return msg + "\n" + childMsg;
 		}
 	}

@@ -46,7 +46,8 @@ public class CastSelector extends PropertySelector {
 	private String target_rule;
 	private String target_field;
 
-	public CastSelector(PropertySelector source) {
+	public CastSelector(PropertySelector source, Boolean optional) {
+		super(optional);
 		this.source = source;
 	}
 

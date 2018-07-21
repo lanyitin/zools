@@ -2,6 +2,7 @@ package tw.lanyitin.zools.ast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import tw.lanyitin.zools.runtime.Location;
 import tw.lanyitin.zools.runtime.type.Primitive;
@@ -43,6 +44,20 @@ public class ZoolsFile extends ASTTree {
 	}
 
 	public RuleStmt resolveRule(final String name) {
-		return this.rules.stream().filter((RuleStmt t) -> t.getName().equals(name)).findFirst().get();
+		Optional<RuleStmt> result = this.rules.stream().filter((RuleStmt t) -> t.getName().equals(name)).findFirst();
+		if (result.isPresent()) {
+			return result.get();
+		} else {
+			throw new RuntimeException(String.format("unable to find rule \"%s\"", name));
+		}
+	}
+
+	public StructDeclStmt resolveStruct(String name) {
+		for (StructDeclStmt struct : structs) {
+			if (struct.getName().equals(name)) {
+				return struct;
+			}
+		}
+		throw new RuntimeException(String.format("unable to find struct \"%s\"", name));
 	}
 }

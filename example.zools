@@ -27,7 +27,7 @@ struct ParkingDCU {
 	SenID: UUID, 
 	ParkStatus: Boolean,
 	RecordTime: DateTime,
-	loc: LatLng
+	loc?: LatLng
 }
 
 //3. Rules
@@ -45,9 +45,9 @@ struct ParkingDCU {
 
 location: LatLng(lat = x, lng = y)
 
-target: [ParkingDCU(ParkingID    = id,
+target: [[ParkingDCU(ParkingID    = id,
                    SenID         = sensor,
                    ParkStatus    = slot_status,
                    RecordTime    = timestamp,
                    loc           = pos@location
-)]
+)]]

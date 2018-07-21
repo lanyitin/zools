@@ -33,7 +33,7 @@ public class PrimitiveContext extends RuleContext {
 					target.getContent()));
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("%s(%s)", getType().getName(), pattern.pattern());

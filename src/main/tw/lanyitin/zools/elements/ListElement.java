@@ -24,7 +24,8 @@ public class ListElement extends Element {
 
 	@Override
 	public String toString() {
-		return "[" + this.childs.stream().
-				map(x -> x.toString()).reduce((a, b) -> {return  a + ", " + b;}).orElse("") + "]";
+		return "[" + this.childs.stream().map(x -> x.toString()).reduce((a, b) -> {
+			return a + ", " + b;
+		}).orElse("") + "]";
 	}
 }

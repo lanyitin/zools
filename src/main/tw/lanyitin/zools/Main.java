@@ -25,9 +25,9 @@ import tw.lanyitin.zools.runtime.ZoolsException;
 public class Main {
 	private static ZoolsFile construct_ast(CommandLine cmd) throws IOException {
 		CharStream in = CharStreams.fromFileName(cmd.getOptionValue("rule"));
-		zoolsLexer lexer = new zoolsLexer(in);
+		ZoolsLexer lexer = new ZoolsLexer(in);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		zoolsParser parser = new zoolsParser(tokens);
+		ZoolsParser parser = new ZoolsParser(tokens);
 		ASTGenerator generator = new ASTGenerator(parser);
 		ZoolsFile file = generator.process();
 		return file;
